@@ -81,10 +81,10 @@ class imgMenu extends BtnMenu {
     const reg = /^h/i
     const cmdValue = this.editor.cmd.queryCommandValue('imgMenu')
     if (reg.test(cmdValue)) {
-    // 选区处于标题内，激活菜单
+      // 选区处于标题内，激活菜单
       this.active()
     } else {
-    // 否则，取消激活
+      // 否则，取消激活
       this.unActive()
     }
   }
@@ -187,15 +187,22 @@ export default {
       }, 500)
     },
     /**
+     * 格式化初始的模板内容
+     */
+    formatOriginData (data) {
+      let tmplContent = data
+      // 去除flex样式 - 防止列表的文字水平位置改变无效，且去除样式的重复
+      tmplContent = tmplContent.replaceAll(/display:flex;|align-items:center;|justify-content:center;|justify-content:flex-end;/gi, '')
+      // .replaceAll(/margin:auto;|padding:0;|margin-left:auto;|margin-right:0;|margin-left:auto;/g, '')
+      return tmplContent
+    },
+    /**
      * 获取模板内容
      */
     getTemplateContent () {
       let cacheContent = '<p>1131212</p>'
+      cacheContent = this.formatOriginData(cacheContent)
       // 对模板内容进行格式化 - 自定义内容格式化
-      // 去除flex样式 - 防止列表的文字水平位置改变无效，且去除样式的重复
-      cacheContent = cacheContent.replaceAll(/display:flex;|align-items:center;|justify-content:center;|justify-content:flex-end;/gi, '')
-      // .replaceAll(/margin:auto;|padding:0;|margin-left:auto;|margin-right:0;|margin-left:auto;/g, '')
-
       this.tmplContent = cacheContent
       this.originContent = cacheContent
       // 重新设置编辑器内容
@@ -303,6 +310,18 @@ export default {
       })
     },
     /**
+     * 格式化要保存的模板内容
+     */
+    formatSaveData (data) {
+      let tmplContent = ''
+      // 对居中和靠右使用flex进行格式化
+      tmplContent = data.replaceAll(/text-align:center;/g, 'display:flex;justify-content:center;align-items:center;text-align:center;')
+      tmplContent = tmplContent.replaceAll(/text-align:right;/g, 'display:flex;justify-content:flex-end;align-items:center;text-align:right;')
+      // tmplContent = tmplContent.replaceAll(/text-align:center;/g, 'margin:auto;text-align:center;padding:0;')
+      // tmplContent = tmplContent.replaceAll(/text-align:right;/g, 'margin-left:auto;margin-right:0;text-align:right;padding:0')
+      return tmplContent
+    },
+    /**
      * 保存
      */
     async handleSave () {
@@ -311,11 +330,7 @@ export default {
       }
       let { tmplContent } = this
       // 保存时，对模板的内容进行格式化
-      // 添加flex样式 - 使表格居中
-      // tmplContent = tmplContent.replaceAll(/text-align:center;/g, 'margin:auto;text-align:center;padding:0;')
-      // tmplContent = tmplContent.replaceAll(/text-align:right;/g, 'margin-left:auto;margin-right:0;text-align:right;padding:0')
-      tmplContent = tmplContent.replaceAll(/text-align:center;/g, 'display:flex;justify-content:center;align-items:center;text-align:center;')
-      tmplContent = tmplContent.replaceAll(/text-align:right;/g, 'display:flex;justify-content:flex-end;align-items:center;text-align:right;')
+      tmplContent = this.formatSaveData(tmplContent)
       console.log('这是保存的模板内容：' + tmplContent)
     },
     /**
